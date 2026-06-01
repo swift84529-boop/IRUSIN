@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הזמנה לאירוסין - ברוך ורבקה</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@300;400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-light: #e8cb7a;
+            --gold-pale: #f5e5b0;
+            --dark: #0a0812;
+            --dark-mid: #120f1e;
+            --cream: #faf5e8;
+            --text: #f0e6c8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body, html {
+            width: 100%;
+            min-height: 100%;
+            background: var(--dark);
+            color: var(--text);
+            font-family: 'Noto Serif Hebrew', serif;
+            overflow-x: hidden;
+        }
+
+        /* ===== CANVAS ===== */
+        #fireworksCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== STARS BG ===== */
+        .stars {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .stars span {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+        }
+
+        @keyframes twinkle {
+            0%,100% { opacity: 0.1; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.4); }
+        }
+
+        /* ===== LAYOUT ===== */
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* ===== CARD ===== */
+        .card {
+            position: relative;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            padding: 0;
+            /* שדרוג: ריחוף קל לכל הכרטיס */
+            animation: floatCard 6s ease-in-out infinite;
+        }
+
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Outer ornament border */
+        .card-border {
+            position: relative;
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            border-radius: 4px;
+            padding: 60px 50px 50px;
+            background: linear-gradient(160deg, rgba(20, 15, 35, 0.97) 0%, rgba(10, 8, 18, 0.99) 100%);
+            box-shadow:
+                0 0 0 1px rgba(201, 168, 76, 0.1),
+                0 0 60px rgba(201, 168, 76, 0.08),
+                inset 0 0 80px rgba(0,0,0,0.5),
+                0 40px 100px rgba(0,0,0,0.8);
+            animation: borderGlow 5s ease-in-out infinite;
+        }
+
+        /* Corner ornaments */
+        .card-border::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            border-radius: 2px;
+            pointer-events: none;
+        }
+
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+        }
+        .corner svg { width: 100%; height: 100%; }
+        .corner.tl { top: 4px; right: 4px; }
+        .corner.tr { top: 4px; left: 4px; transform: scaleX(-1); }
+        .corner.bl { bottom: 4px; right: 4px; transform: scaleY(-1); }
+        .corner.br { bottom: 4px; left: 4px; transform: scale(-1,-1); }
+
+        /* ===== TOP ORNAMENT ===== */
+        .top-ornament {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            padding: 0 20px;
+            font-size: 1.6rem;
+            letter-spacing: 8px;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        .bottom-ornament {
+            position: absolute;
+            bottom: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark-mid);
+            padding: 0 20px;
+            font-size: 1rem;
+            letter-spacing: 6px;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeSlideDown {
+            from { opacity: 0; transform: translateY(-40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        @keyframes borderGlow {
+            0%,100% { box-shadow: 0 0 0 1px rgba(201,168,76,0.1), 0 0 60px rgba(201,168,76,0.06), inset 0 0 80px rgba(0,0,0,0.5), 0 40px 100px rgba(0,0,0,0.8); }
+            50% { box-shadow: 0 0 0 1px rgba(201,168,76,0.3), 0 0 80px rgba(201,168,76,0.15), inset 0 0 80px rgba(0,0,0,0.5), 0 40px 100px rgba(0,0,0,0.8); }
+        }
+        
+        /* שדרוג: הבזק אור לשעה */
+        @keyframes lightFlash {
+            0%, 85% { 
+                text-shadow: 0 0 10px rgba(201,168,76,0.3);
+                color: var(--gold-light);
+            }
+            92% { 
+                text-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff, 0 0 90px var(--gold-light);
+                color: #ffffff;
+                transform: scale(1.05);
+            }
+            100% { 
+                text-shadow: 0 0 10px rgba(201,168,76,0.3);
+                color: var(--gold-light);
+                transform: scale(1);
+            }
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        .opening-line {
+            font-size: 1.15rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            color: rgba(240,230,200,0.75);
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeSlideDown 1.2s ease-out 0.3s forwards;
+        }
+
+        .names-block {
+            opacity: 0;
+            animation: fadeSlideDown 1.4s ease-out 0.6s forwards;
+        }
+
+        .name {
+            font-size: clamp(3rem, 8vw, 4.2rem);
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #b8903a 0%, #e8cb7a 35%, #f5e5b0 50%, #e8cb7a 65%, #b8903a 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 4s linear infinite;
+        }
+
+        .vav-style {
+            display: block;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 1.6rem;
+            font-weight: 300;
+            color: var(--gold-light);
+            -webkit-text-fill-color: var(--gold-light);
+            letter-spacing: 0.15em;
+            margin: 6px 0;
+            animation: none;
+            background: none;
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 28px 0;
+            opacity: 0;
+            animation: fadeIn 1.2s ease-out 1.2s forwards;
+        }
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .divider-diamond {
+            width: 8px;
+            height: 8px;
+            border: 1px solid var(--gold);
+            transform: rotate(45deg);
+            flex-shrink: 0;
+        }
+
+        /* ===== INFO BLOCKS ===== */
+        .info-section {
+            opacity: 0;
+            animation: fadeSlideUp 1.2s ease-out 1s forwards;
+        }
+
+        .date-line {
+            font-size: 1.3rem;
+            font-weight: 300;
+            color: rgba(240,230,200,0.85);
+            margin-bottom: 8px;
+        }
+
+        .venue-name {
+            font-size: 1.9rem;
+            font-weight: 600;
+            color: var(--gold-light);
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            text-shadow: 0 0 20px rgba(201,168,76,0.3);
+        }
+
+        .venue-address {
+            font-size: 1.1rem;
+            font-weight: 300;
+            color: rgba(240,230,200,0.65);
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== TIME BADGE ===== */
+        .time-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 22px auto;
+            padding: 14px 36px;
+            border: 1px solid rgba(201,168,76,0.4);
+            border-radius: 2px;
+            background: rgba(201,168,76,0.06);
+            opacity: 0;
+            animation: fadeSlideUp 1.2s ease-out 1.2s forwards;
+            box-shadow: 0 0 15px rgba(201,168,76,0.05);
+        }
+
+        .time-label {
+            font-size: 1rem;
+            font-weight: 300;
+            color: rgba(240,230,200,0.7);
+            letter-spacing: 0.08em;
+        }
+
+        .time-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            letter-spacing: 0.1em;
+            font-family: 'Cormorant Garamond', serif;
+            display: inline-block;
+            animation: lightFlash 4s infinite; /* הפעלת הבזק האור */
+        }
+
+        /* ===== CLOSING ===== */
+        .closing {
+            opacity: 0;
+            animation: fadeSlideUp 1.2s ease-out 1.4s forwards;
+            margin-top: 8px;
+        }
+
+        .closing-main {
+            font-size: 1.15rem;
+            font-weight: 300;
+            color: rgba(240,230,200,0.8);
+        }
+
+        .closing-sig {
+            margin-top: 8px;
+            font-size: 0.95rem;
+            color: rgba(240,230,200,0.5);
+            letter-spacing: 0.1em;
+        }
+
+        /* ===== CALENDAR BTN ===== */
+        .calendar-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+            padding: 14px 40px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold-light);
+            font-family: 'Noto Serif Hebrew', serif;
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            text-decoration: none;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeSlideUp 1.2s ease-out 1.6s forwards;
+        }
+
+        .calendar-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .calendar-btn:hover {
+            color: var(--cream);
+            border-color: var(--gold-light);
+            box-shadow: 0 0 30px rgba(201,168,76,0.2);
+            transform: translateY(-2px);
+        }
+
+        .calendar-btn:hover::before { opacity: 1; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 500px) {
+            .card-border { padding: 50px 28px 40px; }
+            .name { font-size: 2.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="fireworksCanvas"></canvas>
+<div class="stars" id="starsContainer"></div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-border">
+
+            <!-- Corner SVG ornaments -->
+            <div class="corner tl">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 38 L2 2 L38 2" stroke="#c9a84c" stroke-width="1" fill="none" opacity="0.6"/>
+                    <circle cx="2" cy="2" r="2" fill="#c9a84c" opacity="0.8"/>
+                    <path d="M8 2 Q2 2 2 8" stroke="#c9a84c" stroke-width="0.5" fill="none" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="corner tr">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 38 L2 2 L38 2" stroke="#c9a84c" stroke-width="1" fill="none" opacity="0.6"/>
+                    <circle cx="2" cy="2" r="2" fill="#c9a84c" opacity="0.8"/>
+                    <path d="M8 2 Q2 2 2 8" stroke="#c9a84c" stroke-width="0.5" fill="none" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="corner bl">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 38 L2 2 L38 2" stroke="#c9a84c" stroke-width="1" fill="none" opacity="0.6"/>
+                    <circle cx="2" cy="2" r="2" fill="#c9a84c" opacity="0.8"/>
+                    <path d="M8 2 Q2 2 2 8" stroke="#c9a84c" stroke-width="0.5" fill="none" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="corner br">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 38 L2 2 L38 2" stroke="#c9a84c" stroke-width="1" fill="none" opacity="0.6"/>
+                    <circle cx="2" cy="2" r="2" fill="#c9a84c" opacity="0.8"/>
+                    <path d="M8 2 Q2 2 2 8" stroke="#c9a84c" stroke-width="0.5" fill="none" opacity="0.4"/>
+                </svg>
+            </div>
+
+            <div class="top-ornament">✦ ✦ ✦</div>
+
+            <p class="opening-line">שמחים ונרגשים להזמינכם לשמחת האירוסין של</p>
+
+            <div class="names-block">
+                <div class="name">ברוך ישראל</div>
+                <span class="vav-style">עב״ג</span>
+                <div class="name">רבקה</div>
+            </div>
+
+            <div class="divider">
+                <div class="divider-line"></div>
+                <div class="divider-diamond"></div>
+                <div class="divider-line"></div>
+            </div>
+
+            <div class="info-section">
+                <p class="date-line">ביום שני · כ״ג סיוון תשפ״ה</p>
+
+                <p class="venue-name">אולמי אור אברהם</p>
+                <p class="venue-address">רח׳ הרב הירש 19 · בני ברק</p>
+            </div>
+
+            <div class="time-badge">
+                <span class="time-label">קבלת קהל</span>
+                <span class="time-value">20:00</span>
+            </div>
+
+            <div class="divider" style="animation-delay: 1.4s;">
+                <div class="divider-line"></div>
+                <div class="divider-diamond"></div>
+                <div class="divider-line"></div>
+            </div>
+
+            <div class="closing">
+                <p class="closing-main">נשמח לראותכם משתתפים בשמחתנו</p>
+                <p class="closing-sig">— משפחות החתן והכלה —</p>
+            </div>
+
+            <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=אירוסין+-+ברוך+ורבקה&details=קבלת+קהל+בשעה+20:00&location=אולמי+אור+אברהם,+הרב+הירש+19,+בני+ברק&dates=20250623T170000Z/20250623T200000Z" target="_blank" class="calendar-btn">
+                📅 &nbsp;שמירה ביומן
+            </a>
+
+            <div class="bottom-ornament">✦</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===== STARS =====
+const starsContainer = document.getElementById('starsContainer');
+for (let i = 0; i < 120; i++) {
+    const star = document.createElement('span');
+    const size = Math.random() * 2.5 + 0.5;
+    star.style.cssText = `
+        width: ${size}px; height: ${size}px;
+        top: ${Math.random() * 100}%; left: ${Math.random() * 100}%;
+        --d: ${Math.random() * 4 + 2}s;
+        --delay: ${Math.random() * 5}s;
+        opacity: ${Math.random() * 0.5 + 0.1};
+    `;
+    starsContainer.appendChild(star);
+}
+
+// ===== FIREWORKS =====
+const canvas = document.getElementById('fireworksCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+const colors = ['#c9a84c', '#e8cb7a', '#f5e5b0', '#ffffff', '#b8903a', '#ffd700'];
+
+class Particle {
+    constructor(x, y, color, angle, speed) {
+        this.x = x; this.y = y; this.color = color;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.alpha = 1;
+        this.friction = 0.96;
+        this.gravity = 0.04;
+        this.size = Math.random() * 2.5 + 1;
+    }
+    update() {
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        this.vy += this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= 0.009;
+    }
+    draw() {
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+    }
+}
+
+class Trail {
+    constructor(x, y, tx, ty) {
+        this.x = x; this.y = y;
+        this.tx = tx; this.ty = ty;
+        this.progress = 0; this.speed = 0.04;
+        this.done = false;
+        this.trail = [];
+    }
+    update() {
+        this.progress += this.speed;
+        if (this.progress >= 1) { this.done = true; createBurst(this.tx, this.ty); return; }
+        const cx = this.x + (this.tx - this.x) * this.progress;
+        const cy = this.y + (this.ty - this.y) * this.progress;
+        this.trail.push({x: cx, y: cy, a: 1});
+    }
+    draw() {
+        this.trail.forEach((p, i) => {
+            p.a -= 0.05;
+            if (p.a <= 0) { this.trail.splice(i, 1); return; }
+            ctx.globalAlpha = p.a * 0.6;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#e8cb7a';
+            ctx.fill();
+        });
+    }
+}
+
+let trails = [];
+
+function createBurst(x, y) {
+    const count = 80;
+    for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2;
+        const speed = Math.random() * 5 + 2;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        particles.push(new Particle(x, y, color, angle, speed));
+    }
+}
+
+function launchFirework() {
+    const x = window.innerWidth * 0.5 + (Math.random() - 0.5) * window.innerWidth * 0.7;
+    const targetY = Math.random() * (window.innerHeight * 0.45);
+    trails.push(new Trail(x, window.innerHeight, x + (Math.random()-0.5)*60, targetY));
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    ctx.fillStyle = 'rgba(10, 8, 18, 0.18)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    trails = trails.filter(t => { t.update(); t.draw(); return !t.done; });
+    particles = particles.filter(p => {
+        p.update(); p.draw();
+        return p.alpha > 0;
+    });
+    ctx.globalAlpha = 1;
+}
+
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+window.onload = () => {
+    animate();
+    setTimeout(() => launchFirework(), 400);
+    setTimeout(() => launchFirework(), 900);
+    setTimeout(() => launchFirework(), 1600);
+    setTimeout(() => launchFirework(), 2400);
+    setInterval(() => { if (Math.random() < 0.55) launchFirework(); }, 1000);
+};
+</script>
+</body>
+</html>
